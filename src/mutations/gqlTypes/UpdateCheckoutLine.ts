@@ -182,6 +182,9 @@ export interface UpdateCheckoutLine_checkoutLinesUpdate_checkout_availableShippi
    */
   id: string;
   name: string;
+  /**
+   * The price of the cheapest variant (including discounts).
+   */
   price: UpdateCheckoutLine_checkoutLinesUpdate_checkout_availableShippingMethods_price | null;
 }
 
@@ -204,6 +207,9 @@ export interface UpdateCheckoutLine_checkoutLinesUpdate_checkout_shippingMethod 
    */
   id: string;
   name: string;
+  /**
+   * The price of the cheapest variant (including discounts).
+   */
   price: UpdateCheckoutLine_checkoutLinesUpdate_checkout_shippingMethod_price | null;
 }
 
@@ -467,10 +473,6 @@ export interface UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines_variant {
    */
   quantityAvailable: number;
   /**
-   * Whether the variant is in stock and visible or not.
-   */
-  isAvailable: boolean | null;
-  /**
    * Lists the storefront variant's pricing, the current price and discounts, only meant for displaying.
    */
   pricing: UpdateCheckoutLine_checkoutLinesUpdate_checkout_lines_variant_pricing | null;
@@ -567,6 +569,9 @@ export interface UpdateCheckoutLine_checkoutLinesUpdate_checkout {
    * Shipping methods that can be used with this order.
    */
   availableShippingMethods: (UpdateCheckoutLine_checkoutLinesUpdate_checkout_availableShippingMethods | null)[];
+  /**
+   * The shipping method related with checkout.
+   */
   shippingMethod: UpdateCheckoutLine_checkoutLinesUpdate_checkout_shippingMethod | null;
   /**
    * The price of the shipping, with all the taxes included.

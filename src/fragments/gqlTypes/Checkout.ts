@@ -180,6 +180,9 @@ export interface Checkout_availableShippingMethods {
    */
   id: string;
   name: string;
+  /**
+   * The price of the cheapest variant (including discounts).
+   */
   price: Checkout_availableShippingMethods_price | null;
 }
 
@@ -202,6 +205,9 @@ export interface Checkout_shippingMethod {
    */
   id: string;
   name: string;
+  /**
+   * The price of the cheapest variant (including discounts).
+   */
   price: Checkout_shippingMethod_price | null;
 }
 
@@ -465,10 +471,6 @@ export interface Checkout_lines_variant {
    */
   quantityAvailable: number;
   /**
-   * Whether the variant is in stock and visible or not.
-   */
-  isAvailable: boolean | null;
-  /**
    * Lists the storefront variant's pricing, the current price and discounts, only meant for displaying.
    */
   pricing: Checkout_lines_variant_pricing | null;
@@ -565,6 +567,9 @@ export interface Checkout {
    * Shipping methods that can be used with this order.
    */
   availableShippingMethods: (Checkout_availableShippingMethods | null)[];
+  /**
+   * The shipping method related with checkout.
+   */
   shippingMethod: Checkout_shippingMethod | null;
   /**
    * The price of the shipping, with all the taxes included.

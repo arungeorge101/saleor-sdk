@@ -7,6 +7,7 @@ import { StateItems } from "../../state/types";
 import { PromiseRunResponse } from "../types";
 import { DataErrorAuthTypes } from "./types";
 import { Config } from "../../types";
+import { CREDENTIAL_API_EXISTS } from "../../consts";
 
 export const BROWSER_NO_CREDENTIAL_API_MESSAGE =
   "Saleor SDK is unable to use browser Credential Management API.";
@@ -46,6 +47,7 @@ export class AuthAPI extends ErrorListener {
 
   private jobsManager: JobsManager;
 
+  // temporary solution, might change in future
   private config: Config;
 
   constructor(
@@ -93,10 +95,88 @@ export class AuthAPI extends ErrorListener {
       }
     );
 
-    if (!this.saleorState.signInToken && window.PasswordCredential) {
+    if (!this.saleorState.signInToken && CREDENTIAL_API_EXISTS) {
       this.autoSignIn();
     }
   }
+
+  /**
+   * Tries to register a user account with given email and password.
+   * @param email Email used for new account.
+   * @param password Password used for new account.
+   * @param redirectUrl URL used for redirection.
+   */
+  registerAccount = async (
+    email: string,
+    password: string,
+    redirectUrl: string
+  ): PromiseRunResponse<DataErrorAuthTypes> => {
+    const { data, dataError } = await this.jobsManager.run(
+      "auth",
+      "registerAccount",
+      {
+        email,
+        password,
+        redirectUrl,
+      }
+    );
+
+    if (dataError?.error) {
+      this.fireError(dataError.error, DataErrorAuthTypes.REGISTER_ACCOUNT);
+    }
+
+    if (dataError) {
+      return {
+        data,
+        dataError,
+        pending: false,
+      };
+    }
+
+    return {
+      data,
+      pending: false,
+    };
+  };
+
+  /**
+   * Requests a password reset for an user account with given email.
+   * @param email Email used for account.
+   * @param redirectUrl URL used for redirection.
+   */
+  resetPasswordRequest = async (
+    email: string,
+    redirectUrl: string
+  ): PromiseRunResponse<DataErrorAuthTypes> => {
+    const { data, dataError } = await this.jobsManager.run(
+      "auth",
+      "resetPasswordRequest",
+      {
+        email,
+        redirectUrl,
+      }
+    );
+
+    if (dataError?.error) {
+      this.fireError(
+        dataError.error,
+        DataErrorAuthTypes.RESET_PASSWORD_REQUEST
+      );
+    }
+
+    if (dataError) {
+      return {
+        data,
+        dataError,
+        pending: false,
+      };
+    }
+
+    return {
+      data,
+      pending: false,
+    };
+  };
 
   /**
    * Tries to authenticate user with given email and password.
@@ -115,7 +195,7 @@ export class AuthAPI extends ErrorListener {
     });
 
     try {
-      if (autoSignIn && !dataError?.error && window.PasswordCredential) {
+      if (autoSignIn && !dataError?.error && CREDENTIAL_API_EXISTS) {
         await navigator.credentials.store(
           new window.PasswordCredential({
             id: email,
@@ -142,6 +222,7 @@ export class AuthAPI extends ErrorListener {
     } = await this.jobsManager.run("auth", "provideUser", undefined);
     if (this.config.loadOnStart.checkout) {
       await this.jobsManager.run("checkout", "provideCheckout", {
+        channel: this.config.channel,
         isUserSignedIn: !!data?.user,
       });
     }

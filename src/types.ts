@@ -1,4 +1,7 @@
-import ApolloClient, { ObservableQuery } from "apollo-client";
+import ApolloClient, {
+  ApolloClientOptions,
+  ObservableQuery,
+} from "apollo-client";
 import { ApolloLink } from "apollo-link";
 import { ApolloCache } from "apollo-cache";
 
@@ -28,6 +31,11 @@ export type WatchQueryData<T extends (...args: any) => any> = ReturnType<
   ? R
   : never;
 
+export type ApolloConfigOptions = Omit<
+  ApolloClientOptions<any>,
+  "link" | "cache"
+>;
+
 export interface Config {
   /**
    * Url of the Saleor GraphQL API.
@@ -40,9 +48,13 @@ export interface Config {
     auth: boolean;
     checkout: boolean;
   };
+  /**
+   * Default channel slug.
+   */
+  channel: string;
 }
 
-export type DefaultConfig = Pick<Config, "loadOnStart">;
+export type DefaultConfig = Omit<Config, "apiUrl">;
 
 export type ConfigInput = Omit<Config, keyof DefaultConfig> &
   Partial<DefaultConfig>;
@@ -65,4 +77,8 @@ export interface ApolloConfigInput {
    * If you pass custom client, custom cache and links passed in this config will not be used, you must pass them to client oneself.
    */
   client?: ApolloClient<any>;
+  /**
+   * The rest of Apollo client options, which might be passed to it during its initialization.
+   */
+  options?: ApolloConfigOptions;
 }

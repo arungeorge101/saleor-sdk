@@ -65,6 +65,14 @@ Array [
     "seoTitle": "",
     "slug": "homewares",
   },
+  Object {
+    "__typename": "Category",
+    "id": "Q2F0ZWdvcnk6MjM=",
+    "name": "Audiobooks",
+    "seoDescription": "",
+    "seoTitle": "",
+    "slug": "ebooks",
+  },
 ]
 `;
 
@@ -158,7 +166,33 @@ Array [
     "seoTitle": "",
     "slug": "homewares",
   },
+  Object {
+    "__typename": "Category",
+    "id": "Q2F0ZWdvcnk6MjM=",
+    "name": "Audiobooks",
+    "seoDescription": "",
+    "seoTitle": "",
+    "slug": "ebooks",
+  },
 ]
+`;
+
+exports[`useCategoryList can fetch category 1`] = `
+Object {
+  "__typename": "Category",
+  "backgroundImage": Object {
+    "__typename": "Image",
+    "alt": "",
+    "url": "http://localhost:8000/media/category-backgrounds/accessories_lG4wU3b.jpg",
+  },
+  "description": "",
+  "descriptionJson": "{\\"blocks\\": [{\\"data\\": {\\"text\\": \\"\\"}, \\"type\\": \\"paragraph\\"}]}",
+  "id": "Q2F0ZWdvcnk6Nw==",
+  "name": "Accessories",
+  "seoDescription": "",
+  "seoTitle": "",
+  "slug": "accessories",
+}
 `;
 
 exports[`useCategoryList can fetch next page 1`] = `

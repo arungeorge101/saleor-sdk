@@ -31,7 +31,7 @@ Use `SaleorProvider` with passed custom config in a prop. Then use React hooks i
 ```tsx
 import { SaleorProvider, useAuth } from "@saleor/sdk";
 
-const config = { apiUrl: "http://localhost:8000/graphql/" };
+const config = { apiUrl: "http://localhost:8000/graphql/", channel: "" };
 const apolloConfig = {
   /* 
     Optional custom Apollo client config.
@@ -60,7 +60,7 @@ const App = () => {
        **/
     } else if (data) {
       /**
-       * User signed in succesfully.
+       * User signed in successfully.
        **/
     }
   };
@@ -82,7 +82,7 @@ npm install @saleor/sdk
 Then use SaleorManager to get `SaleorAPI` from `connect` method. This method may also take optional function as an argument, which will be executed every time the `SaleorAPI` state changes.
 
 ```tsx
-const config = { apiUrl: "http://localhost:8000/graphql/" };
+const config = { apiUrl: "http://localhost:8000/graphql/", channel: "" };
 const apolloConfig = {
   /* 
     Optional custom Apollo client config.
@@ -108,7 +108,7 @@ if (dataError) {
    **/
 } else if (data) {
   /**
-   * User signed in succesfully. Read user object from data or from api.auth.
+   * User signed in successfully. Read user object from data or from api.auth.
    **/
   const userData = api.auth.user;
 }
@@ -118,18 +118,18 @@ if (dataError) {
 
 We provide an API with methods and fields, performing one, scoped type of work. You may access them straight from `SaleorAPI` or use React hooks, depending on [which setup do you select](#setup).
 
-| API object              | React hook                                                                     | Description                                                                     |
-| :---------------------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
-| `SaleorAPI.auth`        | `useAuth()`                                                                    | Handles user authentication and stores data about the currently signed in user. |
-| `SaleorAPI.cart`        | `useCart()`                                                                    | Collects products to cart and calculates their prices.                          |
-| `SaleorAPI.checkout`    | `useCheckout()`                                                                | Uses cart and handles the whole checkout process.                               |
-| `SaleorAPI.products`    | `useProductList()`                                                             | Obtains products.                                                               |
-| `SaleorAPI.collections` | `useCollectionList()`                                                          | Obtains collections.                                                            |
-| `SaleorAPI.categories`  | `useCategoryList()`, `useCategoryAncestorsList()`, `useCategoryChildrenList()` | Obtains categories.                                                             |
+| API object              | React hook                                                                                             | Description                                                                     |
+| :---------------------- | :----------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------ |
+| `SaleorAPI.auth`        | `useAuth()`                                                                                            | Handles user authentication and stores data about the currently signed in user. |
+| `SaleorAPI.cart`        | `useCart()`                                                                                            | Collects products to cart and calculates their prices.                          |
+| `SaleorAPI.checkout`    | `useCheckout()`                                                                                        | Uses cart and handles the whole checkout process.                               |
+| `SaleorAPI.products`    | `useProductDetails()`, `useProductList()`                                                              | Obtains products.                                                               |
+| `SaleorAPI.collections` | `useCollectionDetails()`, `useCollectionList()`                                                        | Obtains collections.                                                            |
+| `SaleorAPI.categories`  | `useCategoryDetails()`, `useCategoryList()`, `useCategoryAncestorsList()`, `useCategoryChildrenList()` | Obtains categories.                                                             |
 
 ## Local development
 
-Our aim it to build SDK, highly configurable, as a separate package, which you will not require modifications. Although if you want to alter the project, escecially if you want to contribute, it is possible to develop storefront and SDK simultaneously. To do this, you need
+Our aim it to build SDK, highly configurable, as a separate package, which you will not require modifications. Although if you want to alter the project, especially if you want to contribute, it is possible to develop storefront and SDK simultaneously. To do this, you need
 to link it to the storefront's project.
 
 ```bash
@@ -142,5 +142,5 @@ $ npm link @saleor/sdk
 Notice that in [our example storefront](https://github.com/mirumee/saleor-storefront)
 webpack is configured to always resolve `react` to `./node_modules/react`. It may
 seem redundant for the most use cases, but helps in sdk's local development, because
-it overcomes `npm`'s limitations regarding peer dependencies hoisting, explicitely
+it overcomes `npm`'s limitations regarding peer dependencies hoisting, explicitly
 telling webpack to always have one and only copy of `react`.

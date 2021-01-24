@@ -433,6 +433,9 @@ export interface ProductDetails_product_category_products_edges_node {
    */
   id: string;
   name: string;
+  slug: string;
+  seoDescription: string | null;
+  seoTitle: string | null;
   /**
    * The main thumbnail for a product.
    */
@@ -684,10 +687,6 @@ export interface ProductDetails_product_variants {
    */
   quantityAvailable: number;
   /**
-   * Whether the variant is in stock and visible or not.
-   */
-  isAvailable: boolean | null;
-  /**
    * List of images for the product variant.
    */
   images: (ProductDetails_product_variants_images | null)[] | null;
@@ -708,6 +707,9 @@ export interface ProductDetails_product {
    */
   id: string;
   name: string;
+  slug: string;
+  seoDescription: string | null;
+  seoTitle: string | null;
   /**
    * The main thumbnail for a product.
    */
@@ -734,8 +736,6 @@ export interface ProductDetails_product {
    * List of variants for the product.
    */
   variants: (ProductDetails_product_variants | null)[] | null;
-  seoDescription: string | null;
-  seoTitle: string | null;
   /**
    * Whether the product is in stock and visible or not.
    */
@@ -750,6 +750,8 @@ export interface ProductDetails {
 }
 
 export interface ProductDetailsVariables {
-  id: string;
+  id?: string | null;
+  slug?: string | null;
   countryCode?: CountryCode | null;
+  channel?: string | null;
 }

@@ -28,6 +28,7 @@ import {
   mergeEdges,
 } from "../utils";
 import { SetPasswordChange, SetPasswordResult } from "./types";
+import { WINDOW_EXISTS } from "../consts";
 
 const handleDataErrors = <T extends QueryShape, TData>(
   mapFn: MapFn<T, TData> | WatchMapFn<T, TData>,
@@ -61,16 +62,6 @@ class APIProxy {
   }
 
   getAttributes = this.watchQuery(QUERIES.Attributes, data => data.attributes);
-
-  getProductDetails = this.watchQuery(
-    QUERIES.ProductDetails,
-    data => data.product
-  );
-
-  getCategoryDetails = this.watchQuery(
-    QUERIES.CategoryDetails,
-    data => data.category
-  );
 
   getOrdersByUser = this.watchQuery(QUERIES.OrdersByUser, data =>
     data.me ? data.me.orders : null
@@ -187,10 +178,14 @@ class APIProxy {
       callback(this.isLoggedIn());
     };
 
-    window.addEventListener("auth", eventHandler);
+    if (WINDOW_EXISTS) {
+      window.addEventListener("auth", eventHandler);
+    }
 
     return () => {
-      window.removeEventListener("auth", eventHandler);
+      if (WINDOW_EXISTS) {
+        window.removeEventListener("auth", eventHandler);
+      }
     };
   };
 

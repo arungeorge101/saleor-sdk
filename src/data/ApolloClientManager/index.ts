@@ -11,6 +11,7 @@ import {
   IPaymentModel,
 } from "../../helpers/LocalStorageHandler";
 import * as AuthMutations from "../../mutations/auth";
+import * as UserMutations from "../../mutations/user";
 import * as CheckoutMutations from "../../mutations/checkout";
 import {
   AddCheckoutPromoCode,
@@ -32,6 +33,14 @@ import {
   RemoveCheckoutPromoCode,
   RemoveCheckoutPromoCodeVariables,
 } from "../../mutations/gqlTypes/RemoveCheckoutPromoCode";
+import {
+  RegisterAccount,
+  RegisterAccountVariables,
+} from "../../mutations/gqlTypes/RegisterAccount";
+import {
+  ResetPasswordRequest,
+  ResetPasswordRequestVariables,
+} from "../../mutations/gqlTypes/ResetPasswordRequest";
 import {
   TokenAuth,
   TokenAuthVariables,
@@ -70,7 +79,10 @@ import {
   CheckoutProductVariants,
   CheckoutProductVariants_productVariants,
 } from "../../queries/gqlTypes/CheckoutProductVariants";
-import { UserCheckoutDetails } from "../../queries/gqlTypes/UserCheckoutDetails";
+import {
+  UserCheckoutTokenList,
+  UserCheckoutTokenListVariables,
+} from "../../queries/gqlTypes/UserCheckoutTokenList";
 import { UserDetails } from "../../queries/gqlTypes/UserDetails";
 import * as UserQueries from "../../queries/user";
 import { filterNotEmptyArrayItems } from "../../utils";
@@ -115,6 +127,67 @@ export class ApolloClientManager {
     return {
       data: data?.me,
     };
+  };
+
+  registerAccount = async (
+    email: string,
+    password: string,
+    redirectUrl: string
+  ) => {
+    const { data, errors } = await this.client.mutate<
+      RegisterAccount,
+      RegisterAccountVariables
+    >({
+      fetchPolicy: "no-cache",
+      mutation: UserMutations.registerAccount,
+      variables: {
+        email,
+        password,
+        redirectUrl,
+      },
+    });
+
+    if (errors?.length) {
+      return {
+        error: errors,
+      };
+    }
+    if (data?.accountRegister?.accountErrors.length) {
+      return {
+        error: data.accountRegister.accountErrors,
+      };
+    }
+    return {
+      data: {
+        requiresConfirmation: data?.accountRegister?.requiresConfirmation,
+      },
+    };
+  };
+
+  resetPasswordRequest = async (email: string, redirectUrl: string) => {
+    const { data, errors } = await this.client.mutate<
+      ResetPasswordRequest,
+      ResetPasswordRequestVariables
+    >({
+      fetchPolicy: "no-cache",
+      mutation: UserMutations.resetPasswordRequest,
+      variables: {
+        email,
+        redirectUrl,
+      },
+    });
+
+    if (errors?.length) {
+      return {
+        error: errors,
+      };
+    }
+    if (data?.requestPasswordReset?.accountErrors.length) {
+      return {
+        error: data.requestPasswordReset.accountErrors,
+      };
+    }
+    return {};
   };
 
   signIn = async (email: string, password: string) => {
@@ -220,35 +293,38 @@ export class ApolloClientManager {
 
   getCheckout = async (
     isUserSignedIn: boolean,
+    channel: string,
     checkoutToken: string | null
   ) => {
     let checkout: Checkout | null;
     try {
-      checkout = await new Promise((resolve, reject) => {
+      checkout = await new Promise(async (resolve, reject) => {
+        let token = checkoutToken;
         if (isUserSignedIn) {
-          const observable = this.client.watchQuery<UserCheckoutDetails, any>({
+          const { data, errors } = await this.client.query<
+            UserCheckoutTokenList,
+            UserCheckoutTokenListVariables
+          >({
             fetchPolicy: "network-only",
-            query: CheckoutQueries.userCheckoutDetails,
-          });
-          observable.subscribe(
-            result => {
-              const { data, errors } = result;
-              if (errors?.length) {
-                reject(errors);
-              } else {
-                resolve(data.me?.checkout);
-              }
+            query: CheckoutQueries.userCheckoutTokenList,
+            variables: {
+              channel,
             },
-            error => {
-              reject(error);
-            }
-          );
-        } else if (checkoutToken) {
+          });
+
+          if (errors?.length) {
+            reject(errors);
+          } else if (data.me?.checkoutTokens) {
+            [token] = data.me.checkoutTokens;
+          }
+        }
+
+        if (token) {
           const observable = this.client.watchQuery<CheckoutDetails, any>({
             fetchPolicy: "network-only",
             query: CheckoutQueries.checkoutDetails,
             variables: {
-              token: checkoutToken,
+              token,
             },
           });
           observable.subscribe(
@@ -283,7 +359,8 @@ export class ApolloClientManager {
   };
 
   getRefreshedCheckoutLines = async (
-    checkoutlines: ICheckoutModelLine[] | null
+    checkoutlines: ICheckoutModelLine[] | null,
+    channel: string
   ) => {
     const idsOfMissingVariants = checkoutlines
       ?.filter(line => !line.variant || !line.totalPrice)
@@ -298,6 +375,7 @@ export class ApolloClientManager {
           {
             query: CheckoutQueries.checkoutProductVariants,
             variables: {
+              channel,
               ids: idsOfMissingVariants,
             },
           }
@@ -352,7 +430,6 @@ export class ApolloClientManager {
             variant: {
               attributes: edge.node.attributes,
               id: edge.node.id,
-              isAvailable: edge.node.isAvailable,
               name: edge.node.name,
               pricing: edge.node.pricing,
               product: edge.node.product,
@@ -397,6 +474,7 @@ export class ApolloClientManager {
   createCheckout = async (
     email: string,
     lines: Array<{ variantId: string; quantity: number }>,
+    channel: string,
     shippingAddress?: ICheckoutAddress,
     billingAddress?: ICheckoutAddress
   ) => {
@@ -418,6 +496,7 @@ export class ApolloClientManager {
             streetAddress1: billingAddress.streetAddress1,
             streetAddress2: billingAddress.streetAddress2,
           },
+          channel,
           email,
           lines,
           shippingAddress: shippingAddress && {
@@ -519,10 +598,12 @@ export class ApolloClientManager {
   setShippingAddress = async (
     shippingAddress: ICheckoutAddress,
     email: string,
-    checkoutId: string
+    checkoutId: string,
+    channel: string
   ) => {
     try {
       const variables = {
+        channel,
         checkoutId,
         email,
         shippingAddress: {
@@ -947,7 +1028,6 @@ export class ApolloClientManager {
           variant: {
             attributes: itemVariant?.attributes,
             id: itemVariant!.id,
-            isAvailable: itemVariant?.isAvailable,
             name: itemVariant?.name,
             pricing: itemVariant?.pricing,
             product: itemVariant?.product,

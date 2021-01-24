@@ -22,6 +22,7 @@ describe("Auth API", () => {
     const config = {
       ...defaultConfig,
       apiUrl,
+      channel: "default-channel",
     };
     const localStorageHandler = new LocalStorageHandler();
     const apolloClientManager = new ApolloClientManager(client);
@@ -44,7 +45,7 @@ describe("Auth API", () => {
   });
 
   it("Returns error if credentials are invalid", async () => {
-    const signInResult = await authAPI.signIn("admin@example.com", "admin1");
+    const signInResult = await authAPI.signIn("sdk@example.com", "test1");
 
     expect(signInResult.data).toMatchSnapshot();
     expect(!!signInResult.data?.id).toBe(false);
@@ -59,7 +60,7 @@ describe("Auth API", () => {
   });
 
   it("Can sign in", async () => {
-    const signInResult = await authAPI.signIn("admin@example.com", "admin");
+    const signInResult = await authAPI.signIn("sdk@example.com", "test");
 
     expect(signInResult.data).toMatchSnapshot();
     expect(!!signInResult.data?.id).toBe(true);
@@ -75,18 +76,18 @@ describe("Auth API", () => {
 
   it("Does not cache mutations", async done => {
     await authAPI
-      .signIn("admin@example.com", "admin")
+      .signIn("sdk@example.com", "test")
       .then(() =>
         apiProxy.setPassword({
-          email: "admin@example.com",
-          password: "admin12345678",
+          email: "sdk@example.com",
+          password: "test2345678",
           token: "5hr-73a06b70fd6ad8ab3913",
         })
       )
       .catch(() =>
         apiProxy.setPasswordChange({
-          newPassword: "admin12345678",
-          oldPassword: "admin12345678",
+          newPassword: "test2345678",
+          oldPassword: "test2345678",
         })
       )
       .catch(() => {

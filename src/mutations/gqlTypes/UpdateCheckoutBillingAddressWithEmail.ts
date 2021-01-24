@@ -199,6 +199,9 @@ export interface UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpd
    */
   id: string;
   name: string;
+  /**
+   * The price of the cheapest variant (including discounts).
+   */
   price: UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpdate_checkout_availableShippingMethods_price | null;
 }
 
@@ -221,6 +224,9 @@ export interface UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpd
    */
   id: string;
   name: string;
+  /**
+   * The price of the cheapest variant (including discounts).
+   */
   price: UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpdate_checkout_shippingMethod_price | null;
 }
 
@@ -484,10 +490,6 @@ export interface UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpd
    */
   quantityAvailable: number;
   /**
-   * Whether the variant is in stock and visible or not.
-   */
-  isAvailable: boolean | null;
-  /**
    * Lists the storefront variant's pricing, the current price and discounts, only meant for displaying.
    */
   pricing: UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpdate_checkout_lines_variant_pricing | null;
@@ -584,6 +586,9 @@ export interface UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpd
    * Shipping methods that can be used with this order.
    */
   availableShippingMethods: (UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpdate_checkout_availableShippingMethods | null)[];
+  /**
+   * The shipping method related with checkout.
+   */
   shippingMethod: UpdateCheckoutBillingAddressWithEmail_checkoutBillingAddressUpdate_checkout_shippingMethod | null;
   /**
    * The price of the shipping, with all the taxes included.
@@ -789,6 +794,9 @@ export interface UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_check
    */
   id: string;
   name: string;
+  /**
+   * The price of the cheapest variant (including discounts).
+   */
   price: UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_checkout_availableShippingMethods_price | null;
 }
 
@@ -811,6 +819,9 @@ export interface UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_check
    */
   id: string;
   name: string;
+  /**
+   * The price of the cheapest variant (including discounts).
+   */
   price: UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_checkout_shippingMethod_price | null;
 }
 
@@ -1074,10 +1085,6 @@ export interface UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_check
    */
   quantityAvailable: number;
   /**
-   * Whether the variant is in stock and visible or not.
-   */
-  isAvailable: boolean | null;
-  /**
    * Lists the storefront variant's pricing, the current price and discounts, only meant for displaying.
    */
   pricing: UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_checkout_lines_variant_pricing | null;
@@ -1174,6 +1181,9 @@ export interface UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_check
    * Shipping methods that can be used with this order.
    */
   availableShippingMethods: (UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_checkout_availableShippingMethods | null)[];
+  /**
+   * The shipping method related with checkout.
+   */
   shippingMethod: UpdateCheckoutBillingAddressWithEmail_checkoutEmailUpdate_checkout_shippingMethod | null;
   /**
    * The price of the shipping, with all the taxes included.

@@ -1,11 +1,12 @@
 import { ApolloClient } from "apollo-client";
 
 import { SaleorAPI } from "./api";
-import { ConfigInput, ApolloConfigInput } from "./types";
+import { Config, ConfigInput, ApolloConfigInput } from "./types";
 import APIProxy from "./api/APIProxy";
 import { createSaleorLinks } from "./links";
 import { createSaleorClient } from "./client";
 import { createSaleorCache } from "./cache";
+import { defaultConfig } from "./config";
 
 interface CreateAPIResult {
   api: SaleorAPI;
@@ -25,7 +26,7 @@ interface ConnectResult {
 }
 
 export class SaleorManager {
-  private config: ConfigInput;
+  public config: Config;
 
   private apolloConfig: ApolloConfigInput;
 
@@ -40,7 +41,14 @@ export class SaleorManager {
   private apiChangeListener?: (api?: SaleorAPI) => any;
 
   constructor(config: ConfigInput, apolloConfig?: ApolloConfigInput) {
-    this.config = config;
+    this.config = {
+      ...defaultConfig,
+      ...config,
+      loadOnStart: {
+        ...defaultConfig.loadOnStart,
+        ...config?.loadOnStart,
+      },
+    };
     this.apolloConfig = {
       persistCache: true,
       ...apolloConfig,
@@ -75,12 +83,12 @@ export class SaleorManager {
   }
 
   private static createApi = async (
-    config: ConfigInput,
+    config: Config,
     apolloConfig: ApolloConfigInput,
     tokenExpirationCallback: () => void,
     onSaleorApiChange: () => void
   ): Promise<CreateAPIResult> => {
-    const { cache, persistCache, links, client } = apolloConfig;
+    const { cache, persistCache, links, client, options } = apolloConfig;
 
     const saleorCache =
       !client && cache
@@ -95,7 +103,8 @@ export class SaleorManager {
             apiUrl: config.apiUrl,
             tokenExpirationCallback,
           });
-    const apolloClient = client || createSaleorClient(saleorCache, saleorLinks);
+    const apolloClient =
+      client || createSaleorClient(saleorCache, saleorLinks, options);
 
     const apiProxy = new APIProxy(apolloClient);
     const api = new SaleorAPI(

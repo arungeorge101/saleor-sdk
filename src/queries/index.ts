@@ -6,7 +6,6 @@ import {
 
 import { RequireOnlyOne } from "../tsHelpers";
 import * as AttributesList from "./attributes";
-import * as Category from "./category";
 import * as Collections from "./collections";
 import * as Orders from "./orders";
 import * as Product from "./products";
@@ -19,15 +18,6 @@ import {
 } from "./gqlTypes/UserOrderByToken";
 
 import { Attributes, AttributesVariables } from "./gqlTypes/Attributes";
-import {
-  ProductDetails,
-  ProductDetailsVariables,
-} from "./gqlTypes/ProductDetails";
-
-import {
-  CategoryDetails,
-  CategoryDetailsVariables,
-} from "./gqlTypes/CategoryDetails";
 
 import { GetShop } from "./gqlTypes/GetShop";
 
@@ -53,14 +43,6 @@ export const QUERIES = {
   ): ObservableQuery<Attributes, any> =>
     client.watchQuery({
       query: AttributesList.attributes,
-      ...options,
-    }),
-  CategoryDetails: <TCacheShape>(
-    client: ApolloClient<TCacheShape>,
-    options: QueryOptions<CategoryDetailsVariables>
-  ): ObservableQuery<CategoryDetails, any> =>
-    client.watchQuery({
-      query: Category.categoryQuery,
       ...options,
     }),
   CollectionList: (
@@ -101,14 +83,6 @@ export const QUERIES = {
   ): ObservableQuery<OrdersByUser, any> =>
     client.watchQuery({
       query: Orders.ordersByUser,
-      ...options,
-    }),
-  ProductDetails: <TCacheShape>(
-    client: ApolloClient<TCacheShape>,
-    options: QueryOptions<ProductDetailsVariables>
-  ): ObservableQuery<ProductDetails, any> =>
-    client.watchQuery({
-      query: Product.productDetails,
       ...options,
     }),
   VariantsProducts: <TCacheShape>(

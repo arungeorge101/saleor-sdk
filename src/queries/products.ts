@@ -1,40 +1,14 @@
 import gql from "graphql-tag";
 
-import { checkoutPriceFragment } from "../fragments/checkout";
 import { pageInfo } from "../fragments/pageInfo";
 import {
-  baseProduct,
-  productVariantFragment,
-  selectedAttributeFragment,
+  baseProductFragment,
+  productFragment,
+  productPricingFragment,
 } from "../fragments/products";
 
-export const productPricingFragment = gql`
-  ${checkoutPriceFragment}
-  fragment ProductPricingField on Product {
-    pricing {
-      onSale
-      priceRangeUndiscounted {
-        start {
-          ...Price
-        }
-        stop {
-          ...Price
-        }
-      }
-      priceRange {
-        start {
-          ...Price
-        }
-        stop {
-          ...Price
-        }
-      }
-    }
-  }
-`;
-
 export const productList = gql`
-  ${baseProduct}
+  ${baseProductFragment}
   ${productPricingFragment}
   ${pageInfo}
   query ProductList(
@@ -42,8 +16,15 @@ export const productList = gql`
     $first: Int!
     $sortBy: ProductOrder
     $filter: ProductFilterInput
+    $channel: String
   ) {
-    products(after: $after, first: $first, sortBy: $sortBy, filter: $filter) {
+    products(
+      after: $after
+      first: $first
+      sortBy: $sortBy
+      filter: $filter
+      channel: $channel
+    ) {
       edges {
         node {
           ...BaseProduct
@@ -58,51 +39,22 @@ export const productList = gql`
 `;
 
 export const productDetails = gql`
-  ${baseProduct}
-  ${selectedAttributeFragment}
-  ${productVariantFragment}
-  ${productPricingFragment}
-  query ProductDetails($id: ID!, $countryCode: CountryCode) {
-    product(id: $id) {
-      ...BaseProduct
-      ...ProductPricingField
-      descriptionJson
-      category {
-        id
-        name
-        products(first: 3) {
-          edges {
-            node {
-              ...BaseProduct
-              ...ProductPricingField
-              category {
-                id
-                name
-              }
-            }
-          }
-        }
-      }
-      images {
-        id
-        url
-      }
-      attributes {
-        ...SelectedAttributeFields
-      }
-      variants {
-        ...ProductVariantFields
-      }
-      seoDescription
-      seoTitle
-      isAvailable
+  ${productFragment}
+  query ProductDetails(
+    $id: ID
+    $slug: String
+    $countryCode: CountryCode
+    $channel: String
+  ) {
+    product(id: $id, slug: $slug, channel: $channel) {
+      ...ProductDetails
     }
   }
 `;
 
 export const variantsProducts = gql`
-  query VariantsProducts($ids: [ID]) {
-    productVariants(ids: $ids, first: 100) {
+  query VariantsProducts($ids: [ID], $channel: String) {
+    productVariants(ids: $ids, first: 100, channel: $channel) {
       edges {
         node {
           id
